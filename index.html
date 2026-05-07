@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adrob Language</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7C3AED;
+    --pink: #EC4899;
+    --orange: #F59E0B;
+    --teal: #06B6D4;
+    --green: #10B981;
+    --red: #EF4444;
+    --dark: #1E1B4B;
+    --light: #F0F4FF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #0F0A2E 0%, #1E1B4B 50%, #2D1B69 100%);
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+  }
+
+  /* Floating bubbles */
+  .bubble {
+    position: fixed;
+    border-radius: 50%;
+    opacity: 0.07;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bubble:nth-child(1) { width:300px; height:300px; background:var(--purple); top:-100px; left:-100px; animation-delay:0s; }
+  .bubble:nth-child(2) { width:200px; height:200px; background:var(--pink); top:40%; right:-80px; animation-delay:2s; }
+  .bubble:nth-child(3) { width:150px; height:150px; background:var(--teal); bottom:100px; left:10%; animation-delay:4s; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-30px)} }
+
+  /* HEADER */
+  header {
+    position: relative; z-index:10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 30px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .logo-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 3px solid var(--orange);
+    box-shadow: 0 0 20px rgba(245,158,11,0.5);
+    object-fit: cover;
+    background: linear-gradient(135deg, #7C3AED, #EC4899);
+    display: flex; align-items:center; justify-content:center;
+    font-size: 22px; font-weight: 900;
+    color: white;
+    overflow: hidden;
+  }
+
+  .logo-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+  }
+
+  .logo-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    background: linear-gradient(90deg, #F59E0B, #EC4899, #7C3AED);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .xp-bar-wrap {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: rgba(255,255,255,0.7);
+  }
+  .xp-bar { width: 120px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
+  .xp-fill { height: 100%; width: 60%; background: linear-gradient(90deg, var(--green), var(--teal)); border-radius: 20px; animation: grow 1s ease; }
+  @keyframes grow { from{width:0} to{width:60%} }
+  .xp-text { color: var(--orange); font-weight: 800; font-size: 14px; }
+
+  /* PAGE WRAPPER */
+  .page { position: relative; z-index: 5; }
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* HOME */
+  .home-hero {
+    text-align: center;
+    padding: 50px 20px 30px;
+  }
+  .home-hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(36px, 7vw, 64px);
+    background: linear-gradient(135deg, #F59E0B 0%, #EC4899 50%, #7C3AED 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    animation: slideDown 0.8s ease;
+  }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-30px)} to{opacity:1;transform:translateY(0)} }
+
+  .home-hero p {
+    font-size: 17px; color: rgba(255,255,255,0.7);
+    max-width: 500px; margin: 0 auto 40px;
+    animation: slideDown 1s ease 0.2s both;
+  }
+
+  .lang-cards {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    padding: 0 20px 40px;
+    animation: slideUp 0.8s ease 0.3s both;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+
+  .lang-card {
+    width: 280px;
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    padding: 36px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .lang-card::before {
+    content:''; position:absolute; top:-50%; left:-50%;
+    width:200%; height:200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .lang-card:hover::before { opacity: 1; }
+  .lang-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,255,255,0.3); }
+
+  .lang-card.english { border-top: 4px solid var(--teal); }
+  .lang-card.spanish { border-top: 4px solid var(--orange); }
+
+  .lang-flag { font-size: 56px; margin-bottom: 16px; display: block; animation: bounce 2s infinite; }
+  .lang-card.english .lang-flag { animation-delay: 0s; }
+  .lang-card.spanish .lang-flag { animation-delay: 0.5s; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  .lang-card h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px; margin-bottom: 8px;
+  }
+  .lang-card.english h2 { color: var(--teal); }
+  .lang-card.spanish h2 { color: var(--orange); }
+  .lang-card p { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 20px; }
+
+  .progress-ring-wrap {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+  .mini-progress { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow:hidden; }
+  .mini-fill { height: 100%; border-radius: 20px; }
+  .english .mini-fill { width: 35%; background: linear-gradient(90deg, var(--teal), #818CF8); }
+  .spanish .mini-fill { width: 15%; background: linear-gradient(90deg, var(--orange), var(--pink)); }
+  .progress-pct { font-size: 12px; font-weight: 700; }
+  .english .progress-pct { color: var(--teal); }
+  .spanish .progress-pct { color: var(--orange); }
+
+  .start-btn {
+    width: 100%; padding: 14px;
+    border: none; border-radius: 16px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px; cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .english .start-btn { background: linear-gradient(135deg, var(--teal), #818CF8); color: white; }
+  .spanish .start-btn { background: linear-gradient(135deg, var(--orange), var(--pink)); color: white; }
+  .start-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+
+  /* LESSON PAGE */
+  .lesson-wrap {
+    max-width: 700px; margin: 0 auto;
+    padding: 30px 20px;
+  }
+
+  .back-btn {
+    background: rgba(255,255,255,0.1); border: none;
+    color: white; padding: 10px 20px;
+    border-radius: 20px; cursor: pointer;
+    font-family: 'Cairo', sans-serif; font-size: 14px;
+    margin-bottom: 24px; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+  .lesson-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 30px;
+  }
+  .lesson-icon { font-size: 48px; }
+  .lesson-title { font-family: 'Fredoka One', cursive; font-size: 28px; }
+  .lesson-sub { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 4px; }
+
+  .topics-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 16px;
+  }
+
+  .topic-card {
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 22px 18px;
+    cursor: pointer; transition: all 0.3s;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .topic-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.12); }
+  .topic-icon { font-size: 36px; }
+  .topic-name { font-weight: 700; font-size: 15px; }
+  .topic-desc { color: rgba(255,255,255,0.5); font-size: 12px; }
+  .topic-badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 700;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* CONVERSATION PAGE */
+  .conv-wrap {
+    max-width: 700px; margin: 0 auto; padding: 20px;
+  }
+  .conv-title-bar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .conv-title {
+    font-family: 'Fredoka One', cursive; font-size: 22px;
+  }
+  .scenario-flag { font-size: 30px; }
+
+  .chat-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 20px;
+    height: 380px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .chat-box::-webkit-scrollbar { width: 4px; }
+  .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+  .msg {
+    display: flex; gap: 10px; align-items: flex-end;
+    animation: msgIn 0.4s ease;
+  }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg.bot { flex-direction: row; }
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .msg.bot .msg-avatar { background: linear-gradient(135deg, var(--purple), var(--pink)); }
+  .msg.user .msg-avatar { background: linear-gradient(135deg, var(--teal), var(--green)); }
+
+  .msg-bubble {
+    max-width: 75%; padding: 12px 16px;
+    border-radius: 18px; font-size: 14px; line-height: 1.6;
+  }
+  .msg.bot .msg-bubble {
+    background: rgba(124,58,237,0.3);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: rgba(6,182,212,0.3);
+    border: 1px solid rgba(6,182,212,0.3);
+    border-bottom-right-radius: 4px;
+  }
+  .msg-en { font-weight: 700; font-size: 15px; color: white; }
+  .msg-ar { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 3px; }
+
+  .choices-wrap {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .choice-btn {
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 13px 18px;
+    color: white; cursor: pointer; text-align: right;
+    font-family: 'Cairo', sans-serif; font-size: 14px;
+    transition: all 0.25s; display: flex; justify-content: space-between; align-items: center;
+  }
+  .choice-btn:hover { background: rgba(255,255,255,0.14); transform: translateX(-4px); }
+  .choice-btn.correct { background: rgba(16,185,129,0.25); border-color: var(--green); }
+  .choice-btn.wrong { background: rgba(239,68,68,0.25); border-color: var(--red); }
+  .choice-en { color: rgba(255,255,255,0.6); font-size: 12px; }
+
+  .action-row {
+    display: flex; gap: 10px;
+  }
+  .mic-btn {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    border: none; color: white; width: 52px; height: 52px;
+    border-radius: 50%; font-size: 22px; cursor: pointer;
+    transition: all 0.3s; flex-shrink: 0;
+  }
+  .mic-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(236,72,153,0.5); }
+  .mic-btn.active { animation: pulse 0.8s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,0.5)} 50%{box-shadow:0 0 0 15px rgba(236,72,153,0)} }
+
+  .next-btn {
+    flex: 1; background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; color: white; border-radius: 16px;
+    font-family: 'Fredoka One', cursive; font-size: 17px;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .next-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+
+  /* STATS BADGES */
+  .stats-row {
+    display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .stat-badge {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 12px 20px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px;
+  }
+  .stat-badge .num { font-family:'Fredoka One',cursive; font-size:20px; }
+  .stat-badge.streak .num { color: var(--orange); }
+  .stat-badge.score .num { color: var(--green); }
+  .stat-badge.hearts .num { color: var(--red); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,10,46,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-around;
+    padding: 12px 0 18px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; transition: all 0.2s;
+    padding: 4px 16px; border-radius: 16px;
+    font-size: 11px; color: rgba(255,255,255,0.4);
+  }
+  .nav-item.active { color: white; }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item.active .nav-icon { animation: navPop 0.3s ease; }
+  @keyframes navPop { 0%{transform:scale(0.8)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+  .content-area { padding-bottom: 90px; }
+
+  /* WORD BUBBLE FLOATS */
+  .word-floats {
+    position: fixed; pointer-events: none; z-index: 1;
+    top: 0; left: 0; width: 100%; height: 100%;
+  }
+  .word-float {
+    position: absolute;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    opacity: 0.15;
+    animation: wordFloat linear infinite;
+  }
+  @keyframes wordFloat {
+    0% { transform: translateY(100vh) rotate(-5deg); opacity:0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-100px) rotate(5deg); opacity: 0; }
+  }
+
+  /* RESPONSIVE */
+  @media(max-width:500px) {
+    .lang-cards { flex-direction: column; align-items: center; }
+    .lang-card { width: 100%; max-width: 340px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Decorative bubbles -->
+<div class="bubble"></div>
+<div class="bubble"></div>
+<div class="bubble"></div>
+
+<!-- Floating words -->
+<div class="word-floats" id="wordFloats"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-avatar" id="logoAvatar">A</div>
+    <div>
+      <div class="logo-text">Adrob Language</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);">تعلم بطريقة ممتعة 🎯</div>
+    </div>
+  </div>
+  <div class="xp-bar-wrap">
+    <span>⚡</span>
+    <div class="xp-bar"><div class="xp-fill"></div></div>
+    <span class="xp-text">240 XP</span>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page-section active">
+    <div class="home-hero">
+      <h1>اختر لغتك 🌍</h1>
+      <p>تعلم الإنجليزية والإسبانية من خلال محادثات حقيقية وتمارين تفاعلية ممتعة</p>
+    </div>
+
+    <div class="stats-row" style="justify-content:center;padding:0 20px 20px;">
+      <div class="stat-badge streak">
+        <span>🔥</span>
+        <div><div class="num">7</div><div>أيام متواصلة</div></div>
+      </div>
+      <div class="stat-badge score">
+        <span>⭐</span>
+        <div><div class="num">240</div><div>نقطة XP</div></div>
+      </div>
+      <div class="stat-badge hearts">
+        <span>❤️</span>
+        <div><div class="num">5</div><div>حياة</div></div>
+      </div>
+    </div>
+
+    <div class="lang-cards">
+      <div class="lang-card english" onclick="openLanguage('english')">
+        <span class="lang-flag">🇬🇧</span>
+        <h2>English</h2>
+        <p>تحدث الإنجليزية بثقة في أي موقف يومي</p>
+        <div class="progress-ring-wrap">
+          <div class="mini-progress"><div class="mini-fill"></div></div>
+          <span class="progress-pct">35%</span>
+        </div>
+        <button class="start-btn">ابدأ التعلم →</button>
+      </div>
+      <div class="lang-card spanish" onclick="openLanguage('spanish')">
+        <span class="lang-flag">🇪🇸</span>
+        <h2>Español</h2>
+        <p>تحدث الإسبانية كأهل المكسيك وإسبانيا</p>
+        <div class="progress-ring-wrap">
+          <div class="mini-progress"><div class="mini-fill"></div></div>
+          <span class="progress-pct">15%</span>
+        </div>
+        <button class="start-btn">ابدأ التعلم →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPICS PAGE -->
+  <div id="page-topics" class="page-section">
+    <div class="lesson-wrap">
+      <button class="back-btn" onclick="showPage('home')">← رجوع</button>
+      <div class="lesson-header">
+        <div class="lesson-icon" id="topicsIcon">🇬🇧</div>
+        <div>
+          <div class="lesson-title" id="topicsTitle">اللغة الإنجليزية</div>
+          <div class="lesson-sub">اختر موضوع المحادثة</div>
+        </div>
+      </div>
+      <div class="topics-grid" id="topicsGrid"></div>
+    </div>
+  </div>
+
+  <!-- CONVERSATION PAGE -->
+  <div id="page-conv" class="page-section">
+    <div class="conv-wrap">
+      <button class="back-btn" onclick="showPage('topics')">← رجوع</button>
+      <div class="conv-title-bar">
+        <div class="scenario-flag" id="convFlag">☕</div>
+        <div>
+          <div class="conv-title" id="convTitle">في المقهى</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);" id="convSub">المستوى المبتدئ</div>
+        </div>
+      </div>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="choices-wrap" id="choicesWrap"></div>
+      <div class="action-row">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="تحدث">🎤</button>
+        <button class="next-btn" onclick="nextStep()">التالي ⟶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page-section">
+    <div class="lesson-wrap">
+      <div style="text-align:center;padding:30px 0;">
+        <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#EC4899);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;border:4px solid var(--orange);box-shadow:0 0 30px rgba(245,158,11,0.3);">A</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:26px;">محمد</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:14px;">متعلم متميز 🏆</div>
+      </div>
+      <div class="stats-row" style="justify-content:center;">
+        <div class="stat-badge streak"><span>🔥</span><div><div class="num">7</div><div>يوم</div></div></div>
+        <div class="stat-badge score"><span>⭐</span><div><div class="num">240</div><div>XP</div></div></div>
+        <div class="stat-badge"><span>📚</span><div><div class="num" style="color:var(--purple);">12</div><div>درس</div></div></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:20px;margin-top:10px;">
+        <div style="font-weight:700;margin-bottom:14px;">إنجازاتي 🏅</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <div style="text-align:center"><div style="font-size:36px">🌟</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">أول درس</div></div>
+          <div style="text-align:center"><div style="font-size:36px">🔥</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">7 أيام</div></div>
+          <div style="text-align:center"><div style="font-size:36px">🎯</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">10 دروس</div></div>
+          <div style="text-align:center;opacity:0.3"><div style="font-size:36px">👑</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">50 درس</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end content-area -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="showPage('home');setNav('home')">
+    <div class="nav-icon">🏠</div>
+    <div>الرئيسية</div>
+  </div>
+  <div class="nav-item" id="nav-topics" onclick="setNav('topics')">
+    <div class="nav-icon">📖</div>
+    <div>الدروس</div>
+  </div>
+  <div class="nav-item" id="nav-profile" onclick="showPage('profile');setNav('profile')">
+    <div class="nav-icon">👤</div>
+    <div>ملفي</div>
+  </div>
+</nav>
+
+<script>
+// ---- DATA ----
+const data = {
+  english: {
+    icon: '🇬🇧', title: 'اللغة الإنجليزية',
+    color: '#06B6D4',
+    topics: [
+      { icon:'☕', name:'في المقهى', desc:'اطلب القهوة والطعام', badge:'مبتدئ', key:'cafe_en' },
+      { icon:'✈️', name:'في المطار', desc:'السفر والتنقل', badge:'مبتدئ', key:'airport_en' },
+      { icon:'🏥', name:'عند الطبيب', desc:'وصف الأعراض والمشاكل', badge:'متوسط', key:'doctor_en' },
+      { icon:'🛒', name:'في المتجر', desc:'التسوق والأسعار', badge:'مبتدئ', key:'shop_en' },
+      { icon:'💼', name:'في العمل', desc:'اجتماعات ومهنية', badge:'متقدم', key:'work_en' },
+      { icon:'🍽️', name:'في المطعم', desc:'الطلب والحجز', badge:'مبتدئ', key:'rest_en' },
+    ]
+  },
+  spanish: {
+    icon: '🇪🇸', title: 'اللغة الإسبانية',
+    color: '#F59E0B',
+    topics: [
+      { icon:'☕', name:'في المقهى', desc:'اطلب القهوة والطعام', badge:'مبتدئ', key:'cafe_es' },
+      { icon:'🗺️', name:'الاتجاهات', desc:'اسأل عن الطريق', badge:'مبتدئ', key:'dir_es' },
+      { icon:'🏨', name:'في الفندق', desc:'الحجز والاستقبال', badge:'متوسط', key:'hotel_es' },
+      { icon:'🛒', name:'في السوق', desc:'البيع والشراء', badge:'مبتدئ', key:'shop_es' },
+      { icon:'👨‍👩‍👧', name:'عن العائلة', desc:'التعريف بنفسك', badge:'مبتدئ', key:'family_es' },
+      { icon:'🎉', name:'في الحفلة', desc:'التعارف الاجتماعي', badge:'متوسط', key:'party_es' },
+    ]
+  }
+};
+
+const conversations = {
+  cafe_en: {
+    flag:'☕', title:'في المقهى', sub:'إنجليزي — مبتدئ',
+    steps: [
+      { bot: { en:"Good morning! Welcome. What can I get you?", ar:"صباح الخير! أهلاً. ماذا تريد؟" },
+        choices: [
+          { ar:"كوب قهوة من فضلك", en:"A coffee, please.", correct:true },
+          { ar:"أنا بخير شكراً", en:"I'm fine, thank you.", correct:false },
+          { ar:"ما اسمك؟", en:"What's your name?", correct:false },
+        ]},
+      { bot: { en:"Sure! Small, medium or large?", ar:"حسناً! صغير، وسط أم كبير؟" },
+        choices: [
+          { ar:"أريد أن أنام", en:"I want to sleep.", correct:false },
+          { ar:"وسط من فضلك", en:"Medium please.", correct:true },
+          { ar:"الجو جميل اليوم", en:"The weather is nice today.", correct:false },
+        ]},
+      { bot: { en:"That's 3 dollars. Anything else?", ar:"ثلاثة دولارات. هل تريد شيئاً آخر؟" },
+        choices: [
+          { ar:"لا شكراً، هذا كل شيء", en:"No thanks, that's all.", correct:true },
+          { ar:"أين الحمام؟", en:"Where is the bathroom?", correct:false },
+          { ar:"أحب الموسيقى", en:"I love music.", correct:false },
+        ]},
+      { bot: { en:"Great! Here's your coffee. Enjoy! ☕", ar:"ممتاز! تفضل قهوتك. استمتع بها! ☕" },
+        choices: []
+      }
+    ]
+  },
+  cafe_es: {
+    flag:'☕', title:'في المقهى — إسبانيا',sub:'إسباني — مبتدئ',
+    steps: [
+      { bot: { en:"¡Buenos días! ¿Qué desea tomar?", ar:"صباح الخير! ماذا تريد أن تشرب؟" },
+        choices: [
+          { ar:"كوب قهوة من فضلك", en:"Un café, por favor.", correct:true },
+          { ar:"لا أفهم", en:"No entiendo.", correct:false },
+          { ar:"كيف حالك؟", en:"¿Cómo estás?", correct:false },
+        ]},
+      { bot: { en:"¿Solo o con leche?", ar:"بدون حليب أم مع الحليب؟" },
+        choices: [
+          { ar:"مع الحليب من فضلك", en:"Con leche, por favor.", correct:true },
+          { ar:"أريد الماء", en:"Quiero agua.", correct:false },
+          { ar:"شكراً جزيلاً", en:"Muchas gracias.", correct:false },
+        ]},
+      { bot: { en:"¡Perfecto! Son dos euros.", ar:"ممتاز! يورويان فقط." },
+        choices: [
+          { ar:"تفضل", en:"Aquí tiene.", correct:true },
+          { ar:"غالي جداً!", en:"¡Es muy caro!", correct:false },
+          { ar:"أريد أن أذهب", en:"Quiero irme.", correct:false },
+        ]},
+      { bot: { en:"¡Gracias! ¡Buen provecho! ☕", ar:"شكراً لك! صحتين! ☕" },
+        choices: []
+      }
+    ]
+  },
+  airport_en: {
+    flag:'✈️', title:'في المطار', sub:'إنجليزي — مبتدئ',
+    steps: [
+      { bot:{ en:"Good afternoon! May I see your passport please?", ar:"مساء الخير! هل يمكنني رؤية جواز سفرك؟" },
+        choices:[
+          { ar:"تفضل، هذا جواز سفري", en:"Here you go, this is my passport.", correct:true },
+          { ar:"أين المطعم؟", en:"Where is the restaurant?", correct:false },
+          { ar:"أنا متعب", en:"I'm tired.", correct:false },
+        ]},
+      { bot:{ en:"Thank you. Where are you traveling to?", ar:"شكراً. إلى أين تسافر؟" },
+        choices:[
+          { ar:"أسافر إلى لندن", en:"I'm traveling to London.", correct:true },
+          { ar:"أحب السفر", en:"I love traveling.", correct:false },
+          { ar:"الطائرة كبيرة", en:"The plane is big.", correct:false },
+        ]},
+      { bot:{ en:"How many bags do you have?", ar:"كم حقيبة معك؟" },
+        choices:[
+          { ar:"معي حقيبتان", en:"I have two bags.", correct:true },
+          { ar:"أريد تذكرة", en:"I want a ticket.", correct:false },
+          { ar:"الرحلة طويلة", en:"The flight is long.", correct:false },
+        ]},
+      { bot:{ en:"Perfect! Enjoy your flight! ✈️", ar:"رائع! استمتع برحلتك! ✈️" },
+        choices:[]
+      }
+    ]
+  }
+};
+
+// fill missing conversations
+['shop_en','work_en','rest_en','doctor_en','dir_es','hotel_es','shop_es','family_es','party_es'].forEach(k=>{
+  if(!conversations[k]) conversations[k] = conversations['cafe_en'];
+});
+
+// ---- STATE ----
+let currentLang = 'english';
+let currentConv = null;
+let currentStep = 0;
+let micActive = false;
+
+// ---- FUNCTIONS ----
+function showPage(id) {
+  document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+
+function setNav(id) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el = document.getElementById('nav-'+id);
+  if(el) el.classList.add('active');
+}
+
+function openLanguage(lang) {
+  currentLang = lang;
+  const d = data[lang];
+  document.getElementById('topicsIcon').textContent = d.icon;
+  document.getElementById('topicsTitle').textContent = d.title;
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = '';
+  d.topics.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.innerHTML = `
+      <div class="topic-icon">${t.icon}</div>
+      <div class="topic-name">${t.name}</div>
+      <div class="topic-desc">${t.desc}</div>
+      <span class="topic-badge">${t.badge}</span>
+    `;
+    card.onclick = () => openConversation(t.key, t.icon, t.name);
+    grid.appendChild(card);
+  });
+  showPage('topics');
+}
+
+function openConversation(key, icon, name) {
+  currentConv = conversations[key] || conversations['cafe_en'];
+  currentStep = 0;
+  document.getElementById('convFlag').textContent = currentConv.flag || icon;
+  document.getElementById('convTitle').textContent = currentConv.title || name;
+  document.getElementById('convSub').textContent = currentConv.sub || '';
+  document.getElementById('chatBox').innerHTML = '';
+  document.getElementById('choicesWrap').innerHTML = '';
+  showPage('conv');
+  renderStep();
+}
+
+function renderStep() {
+  const conv = currentConv;
+  if(currentStep >= conv.steps.length) { endConversation(); return; }
+  const step = conv.steps[currentStep];
+  addBotMsg(step.bot.en, step.bot.ar);
+  setTimeout(() => renderChoices(step.choices), 600);
+}
+
+function addBotMsg(en, ar) {
+  const box = document.getElementById('chatBox');
+  const msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div class="msg-bubble">
+      <div class="msg-en">${en}</div>
+      <div class="msg-ar">${ar}</div>
+    </div>`;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function addUserMsg(ar, en) {
+  const box = document.getElementById('chatBox');
+  const msg = document.createElement('div');
+  msg.className = 'msg user';
+  msg.innerHTML = `
+    <div class="msg-avatar">😊</div>
+    <div class="msg-bubble">
+      <div class="msg-en">${en}</div>
+      <div class="msg-ar">${ar}</div>
+    </div>`;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function renderChoices(choices) {
+  const wrap = document.getElementById('choicesWrap');
+  wrap.innerHTML = '';
+  if(!choices || choices.length === 0) return;
+  choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span>${c.ar}</span><span class="choice-en">${c.en}</span>`;
+    btn.onclick = () => selectChoice(c, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectChoice(c, btn) {
+  const wrap = document.getElementById('choicesWrap');
+  wrap.querySelectorAll('.choice-btn').forEach(b => b.onclick = null);
+  if(c.correct) {
+    btn.classList.add('correct');
+    btn.innerHTML += ' ✅';
+    addUserMsg(c.ar, c.en);
+    setTimeout(() => { wrap.innerHTML=''; currentStep++; renderStep(); }, 1000);
+  } else {
+    btn.classList.add('wrong');
+    btn.innerHTML += ' ❌';
+    setTimeout(() => btn.classList.remove('wrong'), 800);
+    wrap.querySelectorAll('.choice-btn').forEach(b => b.onclick = () => {
+      const ch = { ar: b.querySelector('span').textContent, en: b.querySelector('.choice-en').textContent, correct: b !== btn };
+      selectChoice(ch, b);
+    });
+  }
+}
+
+function nextStep() {
+  const step = currentConv.steps[currentStep];
+  if(!step) { endConversation(); return; }
+  if(!step.choices || step.choices.length === 0) {
+    currentStep++; renderStep();
+  }
+}
+
+function endConversation() {
+  const box = document.getElementById('chatBox');
+  const el = document.createElement('div');
+  el.style.cssText = 'text-align:center;padding:20px;animation:msgIn 0.4s ease';
+  el.innerHTML = `<div style="font-size:48px">🎉</div><div style="font-family:'Fredoka One',cursive;font-size:20px;color:#10B981">أحسنت! أكملت المحادثة!</div><div style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:4px">+30 XP</div>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('choicesWrap').innerHTML = '';
+}
+
+function toggleMic() {
+  micActive = !micActive;
+  const btn = document.getElementById('micBtn');
+  btn.classList.toggle('active', micActive);
+  btn.textContent = micActive ? '🔴' : '🎤';
+  if(micActive) {
+    setTimeout(() => { micActive=false; btn.classList.remove('active'); btn.textContent='🎤'; }, 3000);
+  }
+}
+
+// Floating words
+const words = ['Hello','Hola','Good morning','¡Buenos días','Thank you','Gracias','Please','Por favor','Yes','Sí','No','Water','Agua','Coffee','Café'];
+const colors = ['#7C3AED','#EC4899','#06B6D4','#F59E0B','#10B981'];
+function spawnWord() {
+  const container = document.getElementById('wordFloats');
+  const word = document.createElement('div');
+  word.className = 'word-float';
+  word.textContent = words[Math.floor(Math.random()*words.length)];
+  word.style.left = Math.random()*90 + '%';
+  word.style.background = colors[Math.floor(Math.random()*colors.length)];
+  word.style.color = 'white';
+  word.style.animationDuration = (12+Math.random()*10) + 's';
+  word.style.animationDelay = (Math.random()*5) + 's';
+  container.appendChild(word);
+  setTimeout(() => word.remove(), 22000);
+}
+for(let i=0;i<6;i++) setTimeout(spawnWord, i*1500);
+setInterval(spawnWord, 3000);
+</script>
+</body>
+</html>
